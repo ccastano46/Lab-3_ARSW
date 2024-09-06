@@ -21,28 +21,29 @@ public class Consumer extends Thread{
     public Consumer(Queue<Integer> queue){
         this.queue=queue;        
     }
+
+    /**
+     * Metodo que pone a dormir el hilo de consumidor
+     * @param miliseconds, milisegundos por el cual se va a dormir el hilo
+     */
+
+    private void goToSleep(long miliseconds){
+        try {
+            Thread.sleep(miliseconds);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
     @Override
     public void run() {
         while (true) {
-            try {
-                Thread.sleep(5000);
                 if (queue.size() > 0) {
                     int elem=queue.poll();
+                    StartProduction.setStock(StartProduction.getStock() - elem);
                     System.out.println("Consumer consumes "+elem);
-                }else{
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-
-            
+                }else goToSleep(6000);
+                goToSleep(4000);
         }
     }
 }

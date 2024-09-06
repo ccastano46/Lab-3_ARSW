@@ -10,17 +10,19 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 /**
  *
  * @author hcadavid
  */
 public class Producer extends Thread {
 
-    private Queue<Integer> queue = null;
+    private Queue<Integer> queue;
 
-    private int dataSeed = 0;
-    private Random rand=null;
+
+    private Random rand;
     private final long stockLimit;
+
 
     public Producer(Queue<Integer> queue,long stockLimit) {
         this.queue = queue;
@@ -28,20 +30,31 @@ public class Producer extends Thread {
         this.stockLimit=stockLimit;
     }
 
+
+    private synchronized void produce(){
+        int dataSeed = rand.nextInt(100);
+        while (StartProduction.getStock() > stockLimit ||StartProduction.getStock() + dataSeed > stockLimit){
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                Logger.getLogger(Producer.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+        notifyAll();
+        System.out.println("Producer added " + dataSeed);
+        queue.add(dataSeed);
+        StartProduction.setStock(StartProduction.getStock() + dataSeed);
+    }
+
     @Override
     public void run() {
         while (true) {
-
-            dataSeed = dataSeed + rand.nextInt(100);
-            System.out.println("Producer added " + dataSeed);
-            queue.add(dataSeed);
-            
+            produce();
             try {
-                Thread.sleep(5000);
+                Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Producer.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         }
     }
 }

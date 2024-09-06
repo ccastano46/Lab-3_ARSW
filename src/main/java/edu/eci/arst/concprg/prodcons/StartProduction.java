@@ -5,25 +5,31 @@
  */
 package edu.eci.arst.concprg.prodcons;
 
-import java.util.ArrayList;
-import java.util.List;
+
 import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class StartProduction {
+
+    private static long stock;
+
+    public static long getStock(){
+        return stock;
+    }
+
+    public static void setStock(long stock){
+        StartProduction.stock=stock;
+    }
     
     
     public static void main(String[] args) {
-        
+        setStock(0);
         Queue<Integer> queue=new LinkedBlockingQueue<>();
         
         
-        new Producer(queue,Long.MAX_VALUE).start();
+        new Producer(queue,1200).start();
         
         //let the producer create products for 5 seconds (stock).
         try {
@@ -31,8 +37,6 @@ public class StartProduction {
         } catch (InterruptedException ex) {
             Logger.getLogger(StartProduction.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
         new Consumer(queue).start();
     }
     
